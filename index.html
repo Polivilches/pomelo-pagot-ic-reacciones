@@ -21,6 +21,8 @@ body.presenter-mode{background:#111;overflow:hidden}
 .presenter-controls{height:58px;flex:0 0 58px;background:#171615;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px;z-index:5}
 .presenter-controls button{border:1px solid #625c57;background:#302d2b;color:#fff;border-radius:11px;padding:10px 15px;font-weight:800;cursor:pointer}
 .presenter-controls button.primary{background:var(--o);border-color:var(--o)}
+.presenter-controls button.reset{border-color:#a94442;color:#ffd6d3;background:#442321}
+.presenter-controls button.reset:disabled{opacity:.5;cursor:wait}
 .presenter-controls button:disabled{opacity:.35;cursor:not-allowed}
 .slide-count{font-size:12px;color:#ccc;min-width:68px;text-align:center;font-weight:800}
 .participant-strip{position:absolute;left:12px;bottom:12px;display:flex;gap:5px;flex-wrap:wrap;max-width:55%;z-index:2}
@@ -61,17 +63,29 @@ function presenter(){
    <img class="stage-slide" id="slideImg" src="./Slides/slide-01.jpg" alt="Diapositiva 1 de la capacitación">
    <div class="reaction-layer" id="reactionLayer"></div><div class="participant-strip" id="participantStrip"></div>
   </div></div>
-  <div class="presenter-controls"><button id="prev" aria-label="Diapositiva anterior">← ANTERIOR</button><span class="slide-count" id="slideCount">1 / ${SLIDE_COUNT}</span><button class="primary" id="next">SIGUIENTE →</button><button id="full">⛶ PANTALLA COMPLETA</button><button id="roster">OCULTAR NOMBRES</button></div>
+  <div class="presenter-controls"><button id="prev" aria-label="Diapositiva anterior">← ANTERIOR</button><span class="slide-count" id="slideCount">1 / ${SLIDE_COUNT}</span><button class="primary" id="next">SIGUIENTE →</button><button id="full">⛶ PANTALLA COMPLETA</button><button id="roster">OCULTAR NOMBRES</button><button class="reset" id="resetRoom">↻ REINICIAR SALA</button></div>
  </div>`;
  document.getElementById('prev').onclick=()=>goSlide(slideIndex-1);
  document.getElementById('next').onclick=()=>goSlide(slideIndex+1);
  document.getElementById('full').onclick=()=>{const el=document.getElementById('stage');if(el.requestFullscreen)el.requestFullscreen();};
  document.getElementById('roster').onclick=()=>{showRoster=!showRoster;document.getElementById('participantStrip').style.display=showRoster?'flex':'none';document.getElementById('roster').textContent=showRoster?'OCULTAR NOMBRES':'MOSTRAR NOMBRES';};
+ document.getElementById('resetRoom').onclick=resetRoom;
  document.addEventListener('keydown',presenterKeys);
  goSlide(0);
 }
 function presenterKeys(e){if(!document.body.classList.contains('presenter-mode'))return;if(e.key==='ArrowRight'||e.key==='PageDown')goSlide(slideIndex+1);if(e.key==='ArrowLeft'||e.key==='PageUp')goSlide(slideIndex-1);}
 function goSlide(n){slideIndex=Math.max(0,Math.min(SLIDE_COUNT-1,n));const img=document.getElementById('slideImg');if(!img)return;img.src='./Slides/slide-'+String(slideIndex+1).padStart(2,'0')+'.jpg';img.alt='Diapositiva '+(slideIndex+1)+' de '+SLIDE_COUNT;document.getElementById('slideCount').textContent=(slideIndex+1)+' / '+SLIDE_COUNT;document.getElementById('prev').disabled=slideIndex===0;document.getElementById('next').disabled=slideIndex===SLIDE_COUNT-1;}
+
+function clearLiveRoom(){const strip=document.getElementById('participantStrip');if(strip)strip.innerHTML='';const layer=document.getElementById('reactionLayer');if(layer)layer.innerHTML='';const c=document.getElementById('count');if(c)c.textContent='SALA EN VIVO · 0';}
+
+async function resetRoom(){
+ const btn=document.getElementById('resetRoom');
+ if(!confirm('¿Reiniciar la sala? Se limpiarán los participantes de prueba y las reacciones anteriores de esta pantalla. Los celulares podrán volver a entrar normalmente.'))return;
+ btn.disabled=true;btn.textContent='REINICIANDO…';
+ const ok=await send({event_type:'reset',name:'Presentadora'});
+ if(ok){clearLiveRoom();btn.textContent='SALA REINICIADA ✓';setTimeout(()=>{if(btn.isConnected){btn.textContent='↻ REINICIAR SALA';btn.disabled=false;}},1800);}
+ else{btn.textContent='ERROR · REINTENTAR';btn.disabled=false;alert('No se pudo reiniciar la sala. Revisá la conexión e intentá nuevamente.');}
+}
 
 function addParticipant(p){const strip=document.getElementById('participantStrip');if(!strip)return;if(strip.querySelector('[data-person="'+CSS.escape(p.participant_id)+'"]'))return;let d=document.createElement('div');d.className='participant-chip';d.dataset.person=p.participant_id;d.textContent=(p.avatar||'🙂')+' '+(p.name||'Participante');strip.appendChild(d);let c=document.getElementById('count');if(c)c.textContent='SALA EN VIVO · '+strip.children.length;}
 
@@ -79,8 +93,15 @@ function burst(p){const layer=document.getElementById('reactionLayer');if(!layer
 
 function alarm(p){const stage=document.getElementById('stage')||document.body;let d=document.createElement('div');d.className='presenter-danger';d.innerHTML=`<div><div class="face">${p.avatar||'🙂'}</div><h2>${esc(p.name||'Alguien')} tocó el botón que no había que tocar.</h2><p>La confianza en nuestros comerciales acaba de caer un 12%.</p><button>FUE SIN QUERER 😇</button></div>`;d.querySelector('button').onclick=()=>d.remove();stage.appendChild(d);}
 
-function handle(row){if(!row||recentIds.has(row.id))return;recentIds.add(row.id);if(recentIds.size>500)recentIds.clear();if(row.event_type==='join')addParticipant(row);if(row.event_type==='reaction')burst(row);if(row.event_type==='danger')alarm(row);}
-async function startPresenter(){presenter();const {data,error}=await db.from('room_events').select('*').eq('room_code',ROOM).eq('event_type','join').order('created_at',{ascending:true}).limit(150);if(error)console.error(error);(data||[]).forEach(addParticipant);subscribe();}
+function handle(row){if(!row||recentIds.has(row.id))return;recentIds.add(row.id);if(recentIds.size>500)recentIds.clear();if(row.event_type==='reset'){clearLiveRoom();return;}if(row.event_type==='join')addParticipant(row);if(row.event_type==='reaction')burst(row);if(row.event_type==='danger')alarm(row);}
+async function startPresenter(){
+ presenter();
+ const {data:latestReset,error:resetError}=await db.from('room_events').select('created_at').eq('room_code',ROOM).eq('event_type','reset').order('created_at',{ascending:false}).limit(1);
+ if(resetError)console.error(resetError);
+ let query=db.from('room_events').select('*').eq('room_code',ROOM).eq('event_type','join').order('created_at',{ascending:true}).limit(150);
+ if(latestReset&&latestReset.length)query=query.gt('created_at',latestReset[0].created_at);
+ const {data,error}=await query;if(error)console.error(error);(data||[]).forEach(addParticipant);subscribe();
+}
 function subscribe(){channel=db.channel('room-'+ROOM).on('postgres_changes',{event:'INSERT',schema:'public',table:'room_events',filter:'room_code=eq.'+ROOM},payload=>handle(payload.new)).subscribe(status=>{const c=document.getElementById('count');if(c&&status==='SUBSCRIBED')c.textContent+=' · CONECTADO';});}
 async function init(){if(!connect()){configError();return;}if(new URLSearchParams(location.search).has('presenter'))await startPresenter();else choose();}
 init();
