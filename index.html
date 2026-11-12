@@ -4,6 +4,32 @@
 <style>
 :root{--o:#ff5b1f;--ink:#1c1a19;--cream:#faf7f1;--pink:#ffebe2;--lime:#cff55b}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,sans-serif}.wrap{max-width:950px;margin:auto;padding:25px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:900}.brand span{color:var(--o)}.tag{background:var(--ink);color:#fff;border-radius:99px;padding:8px 13px;font-size:11px}.hero{padding:35px 0 15px}.kicker{font-size:11px;font-weight:900;color:var(--o);letter-spacing:.1em}h1{font-size:clamp(38px,7vw,70px);line-height:.92;margin:12px 0}.muted{color:#aaa;line-height:1.5}.card{background:#fff;padding:24px;border-radius:24px;margin:18px 0;box-shadow:0 12px 35px #0000000b}input{width:100%;padding:15px;border:2px solid #ddd;border-radius:13px;font-size:16px}.avatars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.av{background:#fff;border:2px solid #eee;border-radius:18px;padding:16px 8px;font-size:38px;cursor:pointer;text-align:center}.av small{display:block;font-size:12px;font-weight:800;margin-top:7px}.av.sel{border-color:var(--o);background:var(--pink)}.cta{background:var(--o);border:0;color:white;padding:16px 20px;border-radius:14px;font-weight:900;width:100%;font-size:15px;cursor:pointer;margin-top:20px}.screen{min-height:100vh;background:var(--ink);color:#fff;padding:26px}.feed{display:flex;flex-wrap:wrap;gap:10px;min-height:150px;margin:28px 0}.bubble{display:flex;align-items:center;gap:9px;background:#302d2b;border-radius:16px;padding:10px 14px;animation:pop .25s}.bubble .face{font-size:30px}.reactions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.reaction{border:0;border-radius:16px;background:#302d2b;color:#fff;padding:13px 8px;cursor:pointer;font-weight:800}.reaction span{display:block;font-size:28px;margin-bottom:4px}.danger{background:#d92929;color:#fff;border:0;border-radius:15px;padding:17px;width:100%;font-weight:900;margin-top:32px;cursor:pointer}.overlay{position:fixed;inset:0;background:var(--o);color:var(--ink);z-index:10;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px}.overlay .face{font-size:125px}.overlay h2{font-size:clamp(30px,5vw,50px)}.overlay button{border:0;border-radius:99px;padding:13px 20px;font-weight:900}.mode{margin-top:15px;text-align:center}.mode button{border:1px solid #ddd;background:transparent;border-radius:99px;padding:9px 14px;cursor:pointer}.status{font-size:12px;color:#777;margin-top:12px}.empty{color:#aaa;border:1px dashed #555;border-radius:16px;padding:22px;width:100%}.clear{background:transparent;border:1px solid #777;color:#fff;border-radius:99px;padding:9px 14px;cursor:pointer}@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}@media(max-width:600px){.reactions{grid-template-columns:repeat(2,1fr)}.avatars{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}}
+
+/* Modo presentación: diapositiva + reacciones en una sola ventana */
+body.presenter-mode{background:#111;overflow:hidden}
+.presenter-shell{height:100vh;width:100vw;background:#111;display:flex;flex-direction:column;color:#fff;overflow:hidden}
+.presenter-bar{height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#171615;z-index:5;gap:12px}
+.presenter-bar .brand{font-size:13px}.presenter-bar .tag{white-space:nowrap}
+.stage-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px;position:relative}
+.stage{position:relative;width:min(100%, calc((100vh - 116px)*1.7778));aspect-ratio:16/9;background:#262321;overflow:hidden;box-shadow:0 10px 45px #0008}
+.stage-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.reaction-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.float-reaction{position:absolute;display:flex;align-items:center;gap:10px;max-width:min(46%,440px);padding:9px 15px 9px 10px;border-radius:18px;background:#1c1a19eF;color:#fff;box-shadow:0 8px 28px #0005;font-weight:900;animation:floatIn .35s cubic-bezier(.2,.8,.2,1),floatOut .45s ease-in 4.3s forwards;backdrop-filter:blur(8px)}
+.float-reaction .emoji{font-size:clamp(26px,4vw,54px);line-height:1}.float-reaction .who{font-size:clamp(11px,1.5vw,17px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.float-reaction .what{font-size:clamp(9px,1.1vw,13px);color:#cff55b;display:block;margin-top:2px}
+@keyframes floatIn{from{transform:translateY(30px) scale(.65);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes floatOut{to{transform:translateY(-24px) scale(.9);opacity:0}}
+.presenter-controls{height:58px;flex:0 0 58px;background:#171615;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px;z-index:5}
+.presenter-controls button{border:1px solid #625c57;background:#302d2b;color:#fff;border-radius:11px;padding:10px 15px;font-weight:800;cursor:pointer}
+.presenter-controls button.primary{background:var(--o);border-color:var(--o)}
+.presenter-controls button:disabled{opacity:.35;cursor:not-allowed}
+.slide-count{font-size:12px;color:#ccc;min-width:68px;text-align:center;font-weight:800}
+.participant-strip{position:absolute;left:12px;bottom:12px;display:flex;gap:5px;flex-wrap:wrap;max-width:55%;z-index:2}
+.participant-chip{background:#1c1a19dd;border:1px solid #ffffff30;color:#fff;border-radius:99px;padding:5px 9px;font-size:12px;font-weight:800;backdrop-filter:blur(5px)}
+.presenter-danger{position:absolute;inset:0;background:#ff5b1f;z-index:20;display:flex;align-items:center;justify-content:center;text-align:center;color:#1c1a19;padding:4vw;animation:pop .25s}
+.presenter-danger .face{font-size:clamp(100px,20vw,240px);line-height:1}.presenter-danger h2{font-size:clamp(28px,5vw,68px);margin:10px 0}.presenter-danger p{font-size:clamp(14px,2vw,24px)}
+.presenter-danger button{border:0;border-radius:99px;padding:13px 22px;font-weight:900;background:#1c1a19;color:white;cursor:pointer}
+@media(max-width:700px){.presenter-bar{height:40px;flex-basis:40px;padding:0 9px}.presenter-controls{height:54px;flex-basis:54px;gap:5px}.presenter-controls button{padding:9px 10px;font-size:11px}.stage-wrap{padding:3px}.participant-strip{display:none}}
+
 </style></head><body><div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./config.js"></script>
 <script>
@@ -26,10 +52,33 @@ document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>react(Number(b.da
 }
 async function react(i){let r=reactions[i];await send({event_type:'reaction',participant_id:me.id,name:me.name,avatar:me.avatar,emoji:r[0],label:r[1]});}
 async function dont(){await send({event_type:'danger',participant_id:me.id,name:me.name,avatar:me.avatar});}
-function presenter(){app.innerHTML=`<div class="screen"><div class="top"><div class="brand">POMELO <span>INSIGHT</span> × PAGO TIC</div><div class="tag" id="count">SALA EN VIVO · 0</div></div><h1>¿Quién está<br>por acá?</h1><p class="muted">Las reacciones y los avatares aparecen acá en tiempo real.</p><div class="feed" id="feed"><div class="empty" id="empty">Esperando a que se sumen los participantes…</div></div><div class="mode"><button class="clear" id="clear">Limpiar pantalla</button></div><p class="muted">Compartí esta ventana por Google Meet. Los participantes entran desde sus celulares con el link o QR.</p></div>`;document.getElementById('clear').onclick=()=>{document.getElementById('feed').innerHTML='<div class="empty">Pantalla limpia. ¡Seguimos!</div>';};}
-function addParticipant(p){const f=document.getElementById('feed');if(!f)return;document.getElementById('empty')?.remove();let d=document.createElement('div');d.className='bubble';d.dataset.person=p.participant_id;d.innerHTML=`<span class="face">${p.avatar||'🙂'}</span><b>${esc(p.name||'Participante')}</b>`;f.appendChild(d);let c=document.getElementById('count');if(c)c.textContent=(f.querySelectorAll('.bubble').length)+' EN LA SALA';}
-function burst(p){let f=document.getElementById('feed');if(!f)return;let d=document.createElement('div');d.className='bubble';d.innerHTML=`<span class="face">${p.avatar||'🙂'}</span><b>${esc(p.name||'Participante')}</b><span>${p.emoji||''} ${esc(p.label||'')}</span>`;f.prepend(d);setTimeout(()=>d.remove(),5500);}
-function alarm(p){let d=document.createElement('div');d.className='overlay';d.innerHTML=`<div><div class="face">${p.avatar||'🙂'}</div><h2>${esc(p.name||'Alguien')} tocó el botón que no había que tocar.</h2><p>La confianza en nuestros comerciales acaba de caer un 12%.</p><button>FUE SIN QUERER 😇</button></div>`;d.querySelector('button').onclick=()=>d.remove();document.body.appendChild(d);}
+let slideIndex=0; const SLIDE_COUNT=14; let showRoster=true;
+function presenter(){
+ document.body.classList.add('presenter-mode');
+ app.innerHTML=`<div class="presenter-shell">
+  <div class="presenter-bar"><div class="brand">POMELO <span>INSIGHT</span> × PAGO TIC</div><div class="tag" id="count">SALA EN VIVO · 0</div></div>
+  <div class="stage-wrap"><div class="stage" id="stage">
+   <img class="stage-slide" id="slideImg" src="./slides/slide-01.jpg" alt="Diapositiva 1 de la capacitación">
+   <div class="reaction-layer" id="reactionLayer"></div><div class="participant-strip" id="participantStrip"></div>
+  </div></div>
+  <div class="presenter-controls"><button id="prev" aria-label="Diapositiva anterior">← ANTERIOR</button><span class="slide-count" id="slideCount">1 / ${SLIDE_COUNT}</span><button class="primary" id="next">SIGUIENTE →</button><button id="full">⛶ PANTALLA COMPLETA</button><button id="roster">OCULTAR NOMBRES</button></div>
+ </div>`;
+ document.getElementById('prev').onclick=()=>goSlide(slideIndex-1);
+ document.getElementById('next').onclick=()=>goSlide(slideIndex+1);
+ document.getElementById('full').onclick=()=>{const el=document.getElementById('stage');if(el.requestFullscreen)el.requestFullscreen();};
+ document.getElementById('roster').onclick=()=>{showRoster=!showRoster;document.getElementById('participantStrip').style.display=showRoster?'flex':'none';document.getElementById('roster').textContent=showRoster?'OCULTAR NOMBRES':'MOSTRAR NOMBRES';};
+ document.addEventListener('keydown',presenterKeys);
+ goSlide(0);
+}
+function presenterKeys(e){if(!document.body.classList.contains('presenter-mode'))return;if(e.key==='ArrowRight'||e.key==='PageDown')goSlide(slideIndex+1);if(e.key==='ArrowLeft'||e.key==='PageUp')goSlide(slideIndex-1);}
+function goSlide(n){slideIndex=Math.max(0,Math.min(SLIDE_COUNT-1,n));const img=document.getElementById('slideImg');if(!img)return;img.src='./slides/slide-'+String(slideIndex+1).padStart(2,'0')+'.jpg';img.alt='Diapositiva '+(slideIndex+1)+' de '+SLIDE_COUNT;document.getElementById('slideCount').textContent=(slideIndex+1)+' / '+SLIDE_COUNT;document.getElementById('prev').disabled=slideIndex===0;document.getElementById('next').disabled=slideIndex===SLIDE_COUNT-1;}
+
+function addParticipant(p){const strip=document.getElementById('participantStrip');if(!strip)return;if(strip.querySelector('[data-person="'+CSS.escape(p.participant_id)+'"]'))return;let d=document.createElement('div');d.className='participant-chip';d.dataset.person=p.participant_id;d.textContent=(p.avatar||'🙂')+' '+(p.name||'Participante');strip.appendChild(d);let c=document.getElementById('count');if(c)c.textContent='SALA EN VIVO · '+strip.children.length;}
+
+function burst(p){const layer=document.getElementById('reactionLayer');if(!layer)return;const d=document.createElement('div');d.className='float-reaction';const x=8+Math.random()*62,y=10+Math.random()*66;d.style.left=x+'%';d.style.top=y+'%';d.innerHTML=`<span class="emoji">${p.emoji||'✨'}</span><span class="who">${esc(p.name||'Participante')}<span class="what">${esc(p.label||'')}</span></span>`;layer.appendChild(d);setTimeout(()=>d.remove(),4900);}
+
+function alarm(p){const stage=document.getElementById('stage')||document.body;let d=document.createElement('div');d.className='presenter-danger';d.innerHTML=`<div><div class="face">${p.avatar||'🙂'}</div><h2>${esc(p.name||'Alguien')} tocó el botón que no había que tocar.</h2><p>La confianza en nuestros comerciales acaba de caer un 12%.</p><button>FUE SIN QUERER 😇</button></div>`;d.querySelector('button').onclick=()=>d.remove();stage.appendChild(d);}
+
 function handle(row){if(!row||recentIds.has(row.id))return;recentIds.add(row.id);if(recentIds.size>500)recentIds.clear();if(row.event_type==='join')addParticipant(row);if(row.event_type==='reaction')burst(row);if(row.event_type==='danger')alarm(row);}
 async function startPresenter(){presenter();const {data,error}=await db.from('room_events').select('*').eq('room_code',ROOM).eq('event_type','join').order('created_at',{ascending:true}).limit(150);if(error)console.error(error);(data||[]).forEach(addParticipant);subscribe();}
 function subscribe(){channel=db.channel('room-'+ROOM).on('postgres_changes',{event:'INSERT',schema:'public',table:'room_events',filter:'room_code=eq.'+ROOM},payload=>handle(payload.new)).subscribe(status=>{const c=document.getElementById('count');if(c&&status==='SUBSCRIBED')c.textContent+=' · CONECTADO';});}
