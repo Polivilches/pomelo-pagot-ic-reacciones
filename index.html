@@ -58,7 +58,7 @@ function presenter(){
  app.innerHTML=`<div class="presenter-shell">
   <div class="presenter-bar"><div class="brand">POMELO <span>INSIGHT</span> × PAGO TIC</div><div class="tag" id="count">SALA EN VIVO · 0</div></div>
   <div class="stage-wrap"><div class="stage" id="stage">
-   <img class="stage-slide" id="slideImg" src="./slides/slide-01.jpg" alt="Diapositiva 1 de la capacitación">
+   <img class="stage-slide" id="slideImg" src="./Slides/slide-01.jpg" alt="Diapositiva 1 de la capacitación">
    <div class="reaction-layer" id="reactionLayer"></div><div class="participant-strip" id="participantStrip"></div>
   </div></div>
   <div class="presenter-controls"><button id="prev" aria-label="Diapositiva anterior">← ANTERIOR</button><span class="slide-count" id="slideCount">1 / ${SLIDE_COUNT}</span><button class="primary" id="next">SIGUIENTE →</button><button id="full">⛶ PANTALLA COMPLETA</button><button id="roster">OCULTAR NOMBRES</button></div>
@@ -71,7 +71,7 @@ function presenter(){
  goSlide(0);
 }
 function presenterKeys(e){if(!document.body.classList.contains('presenter-mode'))return;if(e.key==='ArrowRight'||e.key==='PageDown')goSlide(slideIndex+1);if(e.key==='ArrowLeft'||e.key==='PageUp')goSlide(slideIndex-1);}
-function goSlide(n){slideIndex=Math.max(0,Math.min(SLIDE_COUNT-1,n));const img=document.getElementById('slideImg');if(!img)return;img.src='./slides/slide-'+String(slideIndex+1).padStart(2,'0')+'.jpg';img.alt='Diapositiva '+(slideIndex+1)+' de '+SLIDE_COUNT;document.getElementById('slideCount').textContent=(slideIndex+1)+' / '+SLIDE_COUNT;document.getElementById('prev').disabled=slideIndex===0;document.getElementById('next').disabled=slideIndex===SLIDE_COUNT-1;}
+function goSlide(n){slideIndex=Math.max(0,Math.min(SLIDE_COUNT-1,n));const img=document.getElementById('slideImg');if(!img)return;img.src='./Slides/slide-'+String(slideIndex+1).padStart(2,'0')+'.jpg';img.alt='Diapositiva '+(slideIndex+1)+' de '+SLIDE_COUNT;document.getElementById('slideCount').textContent=(slideIndex+1)+' / '+SLIDE_COUNT;document.getElementById('prev').disabled=slideIndex===0;document.getElementById('next').disabled=slideIndex===SLIDE_COUNT-1;}
 
 function addParticipant(p){const strip=document.getElementById('participantStrip');if(!strip)return;if(strip.querySelector('[data-person="'+CSS.escape(p.participant_id)+'"]'))return;let d=document.createElement('div');d.className='participant-chip';d.dataset.person=p.participant_id;d.textContent=(p.avatar||'🙂')+' '+(p.name||'Participante');strip.appendChild(d);let c=document.getElementById('count');if(c)c.textContent='SALA EN VIVO · '+strip.children.length;}
 
